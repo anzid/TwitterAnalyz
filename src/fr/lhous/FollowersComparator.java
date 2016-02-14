@@ -15,7 +15,7 @@ public class FollowersComparator implements Comparator<Long>{
 	public int compare(Long id1, Long id2){
 		User u1 = users.get(id1);
 		User u2 = users.get(id2);
-		return u1.getFollowersCount() - u2.getFollowersCount();
+		return  u2.getFollowersCount() - u1.getFollowersCount();
 	}
 
 }

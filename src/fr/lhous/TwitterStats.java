@@ -102,7 +102,12 @@ public class TwitterStats {
 
 	public List<Status> MostRetweetedTweet(String twAccountName, Twitter twitter) throws TwitterException{
 		String query = "from:" + twAccountName;
-		List<Status> tweets = twitter.search(new Query(query).resultType(Query.ResultType.popular)).getTweets();
+		List<Status> tweets = twitter.search(new Query("from:BFMTV").resultType(Query.ResultType.popular)).getTweets();
+		for(Status tweet : tweets){
+			System.out.println("***************************************************");
+			System.out.println(tweet.getText());
+			System.out.println("***************************************************");
+		}
 		return tweets;
 	}
 
