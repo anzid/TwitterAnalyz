@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,7 +46,25 @@ public class TwitterStats {
 		return sortedFollower;
 	}
 
-	public  int numberOfTweetsInDay(String twAccountName, Twitter twitter, String day) throws TwitterException, ParseException{
+	public List<Status> listOfTweets(String twAccountName, Twitter twitter) throws TwitterException{
+		String query = "from:" + twAccountName;
+		return twitter.search(new Query(query)).getTweets();
+	}
+
+	public int[][][]  NumberOfTweetsAndRetweets(String twAccountName, Twitter twitter) throws TwitterException{
+		String query = "from:" + twAccountName;
+		List<Status> tweets = twitter.search(new Query(query)).getTweets();
+		int numberOftweetsAndRetweets[][][] = new int[7][24][2]; 
+		GregorianCalendar calendar =new GregorianCalendar();
+		for(Status tweet : tweets){
+			calendar.setTime( tweet.getCreatedAt());
+			numberOftweetsAndRetweets[calendar.get(Calendar.DAY_OF_WEEK)][calendar.get(Calendar.HOUR_OF_DAY)][0]++;
+			numberOftweetsAndRetweets[calendar.get(Calendar.DAY_OF_WEEK)][calendar.get(Calendar.HOUR_OF_DAY)][1]+= tweet.getRetweetCount();
+		}
+		return numberOftweetsAndRetweets;
+	}
+
+	public  List<Status> listOfTweetsInDay(String twAccountName, Twitter twitter, String day) throws TwitterException, ParseException{
 		String query = "from:" + twAccountName;
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		Calendar c = Calendar.getInstance();
@@ -53,53 +72,10 @@ public class TwitterStats {
 		c.add(Calendar.DATE, 1);  // number of days to add
 		String followingDay = sdf.format(c.getTime());  // dt is now the new date
 		List<Status> tweets = twitter.search(new Query(query).since(day).until(followingDay)).getTweets();
-		return tweets.size();
+		return tweets;
 	} 
 
-	@SuppressWarnings("deprecation")
-	public int[] NumberOfTweetInHour(List<Status> tweets){
-		int[] numberOfTweetInHour = {0,0,0,0,0,0,0,0,0,0,0,0};
-		for(Status tweet : tweets){
-			if(tweet.getCreatedAt().before(new Date(2016, 2, 11, 1, 0)) && tweet.getCreatedAt().after(new Date(2016,2,11,0,0))) {
-				numberOfTweetInHour[0] = numberOfTweetInHour[0] + 1;
-			}
-			else if(tweet.getCreatedAt().before(new Date(2016, 2, 11, 2, 0)) && tweet.getCreatedAt().after(new Date(2016,2,11,1,0))) {
-				numberOfTweetInHour[0] = numberOfTweetInHour[0] + 1;
-			}
-			else if(tweet.getCreatedAt().before(new Date(2016, 2, 11, 3, 0)) && tweet.getCreatedAt().after(new Date(2016,2,11,2,0))) {
-				numberOfTweetInHour[0] = numberOfTweetInHour[0] + 1;
-			}
-			else if(tweet.getCreatedAt().before(new Date(2016, 2, 11, 4, 0)) && tweet.getCreatedAt().after(new Date(2016,2,11,3,0))) {
-				numberOfTweetInHour[0] = numberOfTweetInHour[0] + 1;
-			}
-			else if(tweet.getCreatedAt().before(new Date(2016, 2, 11, 5, 0)) && tweet.getCreatedAt().after(new Date(2016,2,11,4,0))) {
-				numberOfTweetInHour[0] = numberOfTweetInHour[0] + 1;
-			}
-			else if(tweet.getCreatedAt().before(new Date(2016, 2, 11, 6, 0)) && tweet.getCreatedAt().after(new Date(2016,2,11,5,0))) {
-				numberOfTweetInHour[0] = numberOfTweetInHour[0] + 1;
-			}
-			else if(tweet.getCreatedAt().before(new Date(2016, 2, 11, 7, 0)) && tweet.getCreatedAt().after(new Date(2016,2,11,6,0))) {
-				numberOfTweetInHour[0] = numberOfTweetInHour[0] + 1;
-			}
-			else if(tweet.getCreatedAt().before(new Date(2016, 2, 11, 8, 0)) && tweet.getCreatedAt().after(new Date(2016,2,11,7,0))) {
-				numberOfTweetInHour[0] = numberOfTweetInHour[0] + 1;
-			}
-			else if(tweet.getCreatedAt().before(new Date(2016, 2, 11, 9, 0)) && tweet.getCreatedAt().after(new Date(2016,2,11,8,0))) {
-				numberOfTweetInHour[0] = numberOfTweetInHour[0] + 1;
-			}
-			else if(tweet.getCreatedAt().before(new Date(2016, 2, 11, 10, 0)) && tweet.getCreatedAt().after(new Date(2016,2,11,9,0))) {
-				numberOfTweetInHour[0] = numberOfTweetInHour[0] + 1;
-			}
-			else if(tweet.getCreatedAt().before(new Date(2016, 2, 11, 11, 0)) && tweet.getCreatedAt().after(new Date(2016,2,11,10,0))) {
-				numberOfTweetInHour[0] = numberOfTweetInHour[0] + 1;
-			}
-			else if(tweet.getCreatedAt().before(new Date(2016, 2, 11, 12, 0)) && tweet.getCreatedAt().after(new Date(2016,2,11,11,0))) {
-				numberOfTweetInHour[0] = numberOfTweetInHour[0] + 1;
-			}
-		}
-		return numberOfTweetInHour;
-	}
-
+	
 	public List<Status> MostRetweetedTweet(String twAccountName, Twitter twitter) throws TwitterException{
 		String query = "from:" + twAccountName;
 		List<Status> tweets = twitter.search(new Query("from:BFMTV").resultType(Query.ResultType.popular)).getTweets();

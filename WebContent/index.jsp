@@ -22,7 +22,7 @@
  TwitterStats t = new TwitterStats(); 
  TwitterStats twitterStats = new TwitterStats();
  Twitter twitter = twitterStats.Connect();	
- List<User> followers = twitterStats.getFollowers("rogerfederer", twitter);
+ List<User> followers = twitterStats.getFollowers("BFMTV", twitter);
  for(User user: followers){ %>
 
  <div>followers count : <%=user.getFollowersCount() %></div>
@@ -30,12 +30,16 @@
  <div><img alt="" src=" <%=user.getProfileImageURL()%>"></div>
 <%} %>
 <% List<Status> mostRetweetedTweets = twitterStats.MostRetweetedTweet("rogerfederer", twitter);
+int numberOfRetweet = (int) twitterStats.NumberOfRetweetInDay(mostRetweetedTweets);
 for (Status status : mostRetweetedTweets){ %>
 <div>tweet : <%=status.getText() %></div>
  <%} %>
  
 <div style="width: 50%">
 			<canvas id="canvas" height="450" width="600"></canvas>
+		</div>
+<div id="canvas-holder">
+			<canvas id="chart-area" width="300" height="300"/></canvas>
 		</div>
 
 <script>
@@ -51,21 +55,35 @@ for (Status status : mostRetweetedTweets){ %>
 				highlightStroke: "rgba(220,220,220,1)",
 				data : [<%=data[0]%>, <%=data[1]%>, <%=data[2]%>, <%=data[3]%>, <%=data[4]%>, <%=data[5]%>, <%=data[6]%>]
 			},
-			{
-				fillColor : "rgba(151,187,205,0.5)",
-				strokeColor : "rgba(151,187,205,0.8)",
-				highlightFill : "rgba(151,187,205,0.75)",
-				highlightStroke : "rgba(151,187,205,1)",
-				data : [randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor()]
-			}
 		]
 
 	}
+	
+	var pieData = [
+					{
+						value: <%= numberOfRetweet%>,
+						color:"#F7464A",
+						highlight: "#FF5A5E",
+						label: "Tweet"
+					},
+					{
+						value: <%= mostRetweetedTweets.size()%>,
+						color: "#46BFBD",
+						highlight: "#5AD3D1",
+						label: "Retweet"
+					},
+
+
+				];
+	
 	window.onload = function(){
 		var ctx = document.getElementById("canvas").getContext("2d");
+		var ctx = document.getElementById("chart-area").getContext("2d");
+		window.myPie = new Chart(ctx).Pie(pieData);
 		window.myBar = new Chart(ctx).Bar(barChartData, {
 			responsive : true
 		});
+
 	}
 
 	</script>
