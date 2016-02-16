@@ -1,4 +1,3 @@
-<%@ page import="fr.lhous.Marin" %>
 <%@ page import="fr.lhous.Connexion" %>
 <%@ page import="fr.lhous.FollowersComparator" %>
 <%@ page import="fr.lhous.TwitterStats" %>
