@@ -15,6 +15,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 <script type="text/javascript" src="Chart.js"></script>
+<link rel="stylesheet" type="text/css" href="style.css" /> 
 <title>Insert title here</title>
 </head>
 <body>
@@ -24,44 +25,77 @@
  TwitterStats twitterStats = new TwitterStats();
  Twitter twitter = twitterStats.Connect();	
  String twAccountName = "cnn";
+ int i = 1;
  List<User> followers = twitterStats.getTopTenFollowers(twAccountName, twitter);
- for(User user: followers){ %>
+ %>
+ <table style="width: 30%; float:left;" id="tableau" summary="Classement Blogspot par Wikio - Mai 2010">
+ <thead>
+ <tr>
+   <th scope="col">Classement</th>
+   <th scope="col">Image</th>
+   <th scope="col">Nom</th>
+   <th scope="col">Nombre de followers</th>
+ </tr>
+</thead>
 
- <div>Le nombre de followers : <%=user.getFollowersCount() %></div>
- <div>          <%=user.getName()            %></div>
- <div><img alt="" src=" <%=user.getProfileImageURL()%>"></div>
-<%} %>
+ <% for(User user: followers){ %>
+
+
+
+  <tbody>
+    <tr>
+      <td><%=i++%> </td>
+      <td><img alt="" src=" <%=user.getProfileImageURL()%>"></td>
+      <td><%=user.getName()            %></td>
+      <td><%=user.getFollowersCount()%></td>
+
+    </tr>
+    
+  </tbody>
+  <%} %>
+  <tfoot>
+ <tr>
+   <td colspan="5">Classement Top 10 followers</td>
+ </tr>
+</tfoot>
+</table> 
+
+
+ 
+
+
 <% List<Status> mostRetweetedTweets = twitterStats.MostRetweetedTweet("cnn", twitter);
 //int numberOfRetweet = (int) twitterStats.NumberOfRetweetInDay(mostRetweetedTweets);
 int numberOftweetsAndRetweets[][][] = new int[2][7][24]; 
 List<Status> listOfTweets = twitterStats.getTweets("cnn",twitter);
 numberOftweetsAndRetweets = twitterStats.NumberOfTweetsAndRetweets(listOfTweets, twitter);
 for (Status status : mostRetweetedTweets){ %>
-<div>tweet : <%=status.getText() %></div>
+<div id="tweet">tweet : <%=status.getText() %></div>
  <%} %>
  
-<div style="width: 50%">
-			<canvas id="canvas_tweetPerDay" height="450" width="600"></canvas>
-		</div>
-		<div style="width: 50%">
-			<canvas id="canvas_tweetPerHour" height="450" width="600"></canvas>
-		</div>
-		<div style="width:30%">
-			<div>
+<div style=" margin-left:32%; ">
+        <div style="width: 50%; float:left;">
+            <div >
+			     <canvas id="canvas_tweetPerDay" height="450" width="600"></canvas>
+		    </div>
+		    <div >
+			    <canvas id="canvas_tweetPerHour" height="450" width="600"></canvas>
+		    </div>
+        </div>
+        <div style="margin-left:50%">
+		    <div >
 				<canvas id="canvas_retweetPerDay" height="450" width="600"></canvas>
-			</div>
-		</div>
-		<div style="width:30%">
-			<div>
+		    </div>
+		    <div >
 				<canvas id="canvas_retweetPerHour" height="450" width="600"></canvas>
-			</div>
+            </div>
 		</div>
-<div id="canvas-holder">
+</div>
+<!-- <div id="canvas-holder">
 			<canvas id="canvas_retweetInTweets" width="300" height="300"/></canvas>
-		</div>
+		</div>-->
 
 <script>
-
 	var barChartData = {
 		labels : ["Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi","Dimanche"],
 		datasets : [
@@ -205,11 +239,11 @@ for (Status status : mostRetweetedTweets){ %>
 	window.onload = function(){
 		var ctx1 = document.getElementById("canvas_tweetPerDay").getContext("2d");
 		var ctx2 = document.getElementById("canvas_tweetPerHour").getContext("2d");
-		var ctx3 = document.getElementById("canvas_retweetInTweets").getContext("2d");
+		//var ctx3 = document.getElementById("canvas_retweetInTweets").getContext("2d");
 		var ctx4 = document.getElementById("canvas_retweetPerDay").getContext("2d");
 		var ctx5 = document.getElementById("canvas_retweetPerHour").getContext("2d");
 		
-		window.myPie = new Chart(ctx3).Pie(pieData);
+		//window.myPie = new Chart(ctx3).Pie(pieData);
 		window.myBar = new Chart(ctx1).Bar(barChartData, {
 			responsive : true
 		});
