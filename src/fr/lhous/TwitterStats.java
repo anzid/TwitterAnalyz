@@ -5,13 +5,13 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import twitter4j.PagableResponseList;
+import twitter4j.Paging;
 import twitter4j.Query;
 import twitter4j.Status;
 import twitter4j.Twitter;
@@ -25,7 +25,7 @@ public class TwitterStats {
 		return c.connect();
 	}
 
-	public  List<User> getFollowers(String twAccountName, Twitter twitter) throws TwitterException{
+	public  List<User> getTopTenFollowers(String twAccountName, Twitter twitter) throws TwitterException{
 		PagableResponseList<User> followersList;
 		List<User> sortedFollower = new ArrayList<>();
 		Map<Long,User> mapUsers = new HashMap<>();
@@ -43,25 +43,46 @@ public class TwitterStats {
 		for(Long id : cles){
 			sortedFollower.add(mapUsers.get(id));
 		}
-		return sortedFollower;
+		return sortedFollower.subList(0, 10);
+	}
+	
+	public List<Status> getTweets(String twAccountName, Twitter twitter) throws TwitterException{
+		int pageno = 1;
+		String user = twAccountName;
+		List<Status> tweets = new ArrayList();
+		while (true) {
+			try {
+				int size = tweets.size(); 
+				Paging page = new Paging(pageno++, 100);
+				tweets.addAll(twitter.getUserTimeline(user, page));
+				if (tweets.size() == size)
+					break;
+			}
+			catch(TwitterException e) {
+
+				e.printStackTrace();
+			}
+		}
+		return tweets;
 	}
 
-	public List<Status> listOfTweets(String twAccountName, Twitter twitter) throws TwitterException{
-		String query = "from:" + twAccountName;
-		return twitter.search(new Query(query)).getTweets();
-	}
-
-	public int[][][]  NumberOfTweetsAndRetweets(String twAccountName, Twitter twitter) throws TwitterException{
-		String query = "from:" + twAccountName;
-		List<Status> tweets = twitter.search(new Query(query)).getTweets();
-		int numberOftweetsAndRetweets[][][] = new int[7][24][2]; 
+	public int[][][]  NumberOfTweetsAndRetweets(List<Status> tweets, Twitter twitter) throws TwitterException{
+		int numberOftweetsAndRetweets[][][] = new int[2][8][24]; 
 		GregorianCalendar calendar =new GregorianCalendar();
 		for(Status tweet : tweets){
 			calendar.setTime( tweet.getCreatedAt());
-			numberOftweetsAndRetweets[calendar.get(Calendar.DAY_OF_WEEK)][calendar.get(Calendar.HOUR_OF_DAY)][0]++;
-			numberOftweetsAndRetweets[calendar.get(Calendar.DAY_OF_WEEK)][calendar.get(Calendar.HOUR_OF_DAY)][1]+= tweet.getRetweetCount();
+			numberOftweetsAndRetweets[0][calendar.get(Calendar.DAY_OF_WEEK)][calendar.get(Calendar.HOUR_OF_DAY)]++;
+			numberOftweetsAndRetweets[1][calendar.get(Calendar.DAY_OF_WEEK)][calendar.get(Calendar.HOUR_OF_DAY)]+= tweet.getRetweetCount();
 		}
 		return numberOftweetsAndRetweets;
+	}
+	
+	public int NumberOfTweetInDay(String twAccountName, Twitter twitter, int[][][] numberOfTweetsAndRetweets, int day ){
+		int NumberOfTweetInDay = 0;
+		for(int i=0; i< 24; i++){
+			NumberOfTweetInDay += numberOfTweetsAndRetweets[0][day][i];
+		}
+		return NumberOfTweetInDay;
 	}
 
 	public  List<Status> listOfTweetsInDay(String twAccountName, Twitter twitter, String day) throws TwitterException, ParseException{
@@ -75,7 +96,6 @@ public class TwitterStats {
 		return tweets;
 	} 
 
-	
 	public List<Status> MostRetweetedTweet(String twAccountName, Twitter twitter) throws TwitterException{
 		String query = "from:" + twAccountName;
 		List<Status> tweets = twitter.search(new Query("from:BFMTV").resultType(Query.ResultType.popular)).getTweets();
