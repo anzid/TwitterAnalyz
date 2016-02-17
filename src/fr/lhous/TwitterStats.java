@@ -53,7 +53,7 @@ public class TwitterStats {
 		while (true) {
 			try {
 				int size = tweets.size(); 
-				Paging page = new Paging(pageno++, 100);
+				Paging page = new Paging(pageno++, 40);
 				tweets.addAll(twitter.getUserTimeline(user, page));
 				if (tweets.size() == size)
 					break;
@@ -98,7 +98,7 @@ public class TwitterStats {
 
 	public List<Status> MostRetweetedTweet(String twAccountName, Twitter twitter) throws TwitterException{
 		String query = "from:" + twAccountName;
-		List<Status> tweets = twitter.search(new Query("from:BFMTV").resultType(Query.ResultType.popular)).getTweets();
+		List<Status> tweets = twitter.search(new Query("from:cnn").resultType(Query.ResultType.popular)).getTweets();
 		for(Status tweet : tweets){
 			System.out.println("***************************************************");
 			System.out.println(tweet.getText());
@@ -117,13 +117,12 @@ public class TwitterStats {
 		return result;
 	}
 
-	public float NumberOfRetweetInDay(List<Status> tweets){
-		int result = 0;
-		for(Status tweet : tweets){
-			result = result + tweet.getRetweetCount();		
+	public int NumberOfRetweetInDay(String twAccountName, Twitter twitter, int[][][] numberOfTweetsAndRetweets, int day ){
+		int NumberOfRetweetInDay = 0;
+		for(int i=0; i< 24; i++){
+			NumberOfRetweetInDay += numberOfTweetsAndRetweets[1][day][i];
 		}
-		result = result / tweets.size();
-		return result;
+		return NumberOfRetweetInDay;
 	}
 
 }
