@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
@@ -25,6 +26,7 @@ public class TwitterStats {
 		return c.connect();
 	}
 
+	//Return top 10 followers
 	public  List<User> getTopTenFollowers(String twAccountName, Twitter twitter) throws TwitterException{
 		PagableResponseList<User> followersList;
 		List<User> sortedFollower = new ArrayList<>();
@@ -32,12 +34,12 @@ public class TwitterStats {
 		int countPages = 0;
 		long cursor = -1;
 		do {
-			followersList = twitter.friendsFollowers().getFollowersList( twAccountName, cursor, 200);
+			followersList = twitter.friendsFollowers().getFollowersList( twAccountName, cursor, 20);
 			for (User user : followersList) {
 				mapUsers.put(user.getId(), user);
 			}
-		} while ((cursor = followersList.getNextCursor()) != 0 && ++countPages < 2); 
-		System.out.println(followersList);
+		} while ((cursor = followersList.getNextCursor()) != 0 && ++countPages < 10); 
+		System.out.println("followers recuperés");
 		List<Long> cles = new ArrayList<Long>(mapUsers.keySet());
 		Collections.sort(cles, new FollowersComparator(mapUsers) );
 		for(Long id : cles){
@@ -45,7 +47,8 @@ public class TwitterStats {
 		}
 		return sortedFollower.subList(0, 10);
 	}
-	
+
+	// return list of tweets
 	public List<Status> getTweets(String twAccountName, Twitter twitter) throws TwitterException{
 		int pageno = 1;
 		String user = twAccountName;
@@ -53,7 +56,7 @@ public class TwitterStats {
 		while (true) {
 			try {
 				int size = tweets.size(); 
-				Paging page = new Paging(pageno++, 40);
+				Paging page = new Paging(pageno++, 10);
 				tweets.addAll(twitter.getUserTimeline(user, page));
 				if (tweets.size() == size)
 					break;
@@ -63,20 +66,25 @@ public class TwitterStats {
 				e.printStackTrace();
 			}
 		}
+		System.out.println("tweets recuperés");
 		return tweets;
 	}
 
+	// ranks tweets by date and time
 	public int[][][]  NumberOfTweetsAndRetweets(List<Status> tweets, Twitter twitter) throws TwitterException{
 		int numberOftweetsAndRetweets[][][] = new int[2][8][24]; 
 		GregorianCalendar calendar =new GregorianCalendar();
+
 		for(Status tweet : tweets){
 			calendar.setTime( tweet.getCreatedAt());
 			numberOftweetsAndRetweets[0][calendar.get(Calendar.DAY_OF_WEEK)][calendar.get(Calendar.HOUR_OF_DAY)]++;
 			numberOftweetsAndRetweets[1][calendar.get(Calendar.DAY_OF_WEEK)][calendar.get(Calendar.HOUR_OF_DAY)]+= tweet.getRetweetCount();
 		}
+		System.out.println("tweets classés");
 		return numberOftweetsAndRetweets;
 	}
-	
+
+	// return the number of tweets in day
 	public int NumberOfTweetInDay(String twAccountName, Twitter twitter, int[][][] numberOfTweetsAndRetweets, int day ){
 		int NumberOfTweetInDay = 0;
 		for(int i=0; i< 24; i++){
@@ -85,6 +93,7 @@ public class TwitterStats {
 		return NumberOfTweetInDay;
 	}
 
+	// return a list of tweets in day
 	public  List<Status> listOfTweetsInDay(String twAccountName, Twitter twitter, String day) throws TwitterException, ParseException{
 		String query = "from:" + twAccountName;
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -96,27 +105,15 @@ public class TwitterStats {
 		return tweets;
 	} 
 
+	// return a list of the most retweeted tweets
 	public List<Status> MostRetweetedTweet(String twAccountName, Twitter twitter) throws TwitterException{
 		String query = "from:" + twAccountName;
 		List<Status> tweets = twitter.search(new Query("from:cnn").resultType(Query.ResultType.popular)).getTweets();
-		for(Status tweet : tweets){
-			System.out.println("***************************************************");
-			System.out.println(tweet.getText());
-			System.out.println("***************************************************");
-		}
+		System.out.println("mostRetweetedTweets recuperés");
 		return tweets;
 	}
 
-
-	public float NumberOfRetweetInHour(List<Status> tweets){
-		int result = 0;
-		for(Status tweet : tweets){
-			result = result + tweet.getRetweetCount();		
-		}
-		result = result / tweets.size();
-		return result;
-	}
-
+	//return the number of tweets in hour
 	public int NumberOfRetweetInDay(String twAccountName, Twitter twitter, int[][][] numberOfTweetsAndRetweets, int day ){
 		int NumberOfRetweetInDay = 0;
 		for(int i=0; i< 24; i++){
