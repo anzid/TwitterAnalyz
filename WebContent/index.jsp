@@ -12,91 +12,86 @@
     pageEncoding="ISO-8859-1"%>
 <!DOCTYPE html>
 <html>
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<script type="text/javascript" src="Chart.js"></script>
-<link rel="stylesheet" type="text/css" href="style.css" /> 
-<title>Insert title here</title>
-</head>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+		<script type="text/javascript" src="Chart.js"></script>
+		<link rel="stylesheet" type="text/css" href="style.css" /> 
+		<title>Insert title here</title>
+	</head>
 <body>
 
     <div style=" float:left; padding-top: 50px; font-size: 40px; line-height: 24px; color: #1E7EBE; margin-right: 10px; margin-left: 150px;">Analyse d'influence du compte Twitter</div>
     <div> <img src="Cnn.svg.png" width="20%"> </div>
- <%
- TwitterStats t = new TwitterStats(); 
- TwitterStats twitterStats = new TwitterStats();
- Twitter twitter = twitterStats.Connect();	
- String twAccountName = "cnn";
- int i = 1;
- List<User> followers = twitterStats.getTopTenFollowers(twAccountName, twitter);
- %>
+ 	<%
+ 	TwitterStats t = new TwitterStats(); 
+ 	TwitterStats twitterStats = new TwitterStats();
+ 	Twitter twitter = twitterStats.Connect();	
+ 	String twAccountName = "cnn";
+ 	int i = 1;
+ 	List<User> followers = twitterStats.getTopTenFollowers(twAccountName, twitter);
+ 	%>
 
- <div style="margin-bottom:140px;">
- <table style="width: 30%; float:left;" id="tableau" >
- <thead>
- <tr>
-   <th scope="col">Classement</th>
-   <th scope="col">Image</th>
-   <th scope="col">Nom</th>
-   <th scope="col">Nombre de followers</th>
- </tr>
-</thead>
+ 	<div style="margin-bottom:140px;">
+ 		<table style="width: 30%; float:left;" id="tableau" >
+ 			<thead>
+ 				<tr>
+   					<th scope="col">Classement</th>
+   					<th scope="col">Image</th>
+   					<th scope="col">Nom</th>
+   					<th scope="col">Nombre de followers</th>
+ 				</tr>
+			</thead>
 
- <% for(User user: followers){ %>
-
-
-
-  <tbody>
-    <tr>
-      <td><%=i++%> </td>
-      <td><img alt="" src=" <%=user.getProfileImageURL()%>"></td>
-      <td><%=user.getName()%></td>
-      <td><%=user.getFollowersCount()%></td>
-
-    </tr>
-    
-  </tbody>
-  <%} %>
-  <tfoot>
- <tr>
-   <td colspan="5">Classement Top 10 followers</td>
- </tr>
-</tfoot>
-</table> 
+ 			<% for(User user: followers){ %>
+  			<tbody>
+    			<tr>
+      				<td><%=i++%> </td>
+      				<td><img alt="" src=" <%=user.getProfileImageURL()%>"></td>
+      				<td><%=user.getName()%></td>
+      				<td><%=user.getFollowersCount()%></td>
+    			</tr>
+  			</tbody>
+  			<%} %>
+  			<tfoot>
+ 				<tr>
+   					<td colspan="5">Classement Top 10 followers</td>
+ 				</tr>
+			</tfoot>
+		</table> 
 
 
- <div style=" margin-left:32%; ">
-        <div style="width: 50%; float:left;">
-            <div>
-			     <canvas id="canvas_tweetPerDay" height="450" width="600"></canvas>
-		    </div>
-		    <div >
-			    <canvas id="canvas_tweetPerHour" height="450" width="600"></canvas>
-		    </div>
-        </div>
-        <div style="margin-left:50%">
-		    <div >
-				<canvas id="canvas_retweetPerDay" height="450" width="600"></canvas>
-		    </div>
-		    <div >
-				<canvas id="canvas_retweetPerHour" height="450" width="600"></canvas>
-            </div>
+ 		<div style=" margin-left:32%; ">
+        	<div style="width: 50%; float:left;">
+            	<div>
+			     	<canvas id="canvas_tweetPerDay" height="450" width="600"></canvas>
+		    	</div>
+		    	<div >
+			    	<canvas id="canvas_tweetPerHour" height="450" width="600"></canvas>
+		    	</div>
+        	</div>
+        	<div style="margin-left:50%">
+		    	<div >
+					<canvas id="canvas_retweetPerDay" height="450" width="600"></canvas>
+		    	</div>
+		    	<div >
+					<canvas id="canvas_retweetPerHour" height="450" width="600"></canvas>
+            	</div>
+			</div>
 		</div>
-</div>
-</div>
+	</div>
 
-<% List<Status> mostRetweetedTweets = twitterStats.MostRetweetedTweet(twAccountName, twitter);
-int numberOftweetsAndRetweets[][][] = new int[2][7][24]; 
-List<Status> listOfTweets = twitterStats.getTweets(twAccountName,twitter);
-numberOftweetsAndRetweets = twitterStats.NumberOfTweetsAndRetweets(listOfTweets, twitter);
-%>
-<h1>Les tweets les plus retweetes</h1>
-<div style="margin-left: 500px;">
-<% for (Status status : mostRetweetedTweets){ %>
-<div id="tweet" style=" float:left;">tweet : <%=status.getText() %></div>
-<div style=" float:left;"><%=status.getRetweetCount() %></div>
- <%} %>
- </div>
+	<% List<Status> mostRetweetedTweets = twitterStats.MostRetweetedTweet(twAccountName, twitter);
+	int numberOftweetsAndRetweets[][][] = new int[2][7][24]; 
+	List<Status> listOfTweets = twitterStats.getTweets(twAccountName,twitter);
+	numberOftweetsAndRetweets = twitterStats.NumberOfTweetsAndRetweets(listOfTweets, twitter);
+	%>
+	<h1>Les tweets les plus retweetes</h1>
+	<div style="margin-left: 500px;">
+	<% for (Status status : mostRetweetedTweets){ %>
+	<div id="tweet" style=" float:left;">tweet : <%=status.getText() %></div>
+	<div style=" float:left;"><%=status.getRetweetCount() %></div>
+ 	<%} %>
+ 	</div>
 
 <script type="text/javascript" src="http://code.jquery.com/jquery-latest.js"></script>
 <script type="text/javascript">
